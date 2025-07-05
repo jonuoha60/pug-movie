@@ -79,7 +79,6 @@ app.post('/edit', async (req, res) => {
     }
 });
 
-// POST-based delete (HTML form friendly)
 app.post('/delete', async (req, res) => {
     const { id } = req.body;
 
