@@ -1,0 +1,39 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/stylesheets/addmovie.css')
+
+    title Register
+  body
+    h1 Register
+
+    form(action="/register" method="POST" id="registerForm")
+      div
+        label(for="username") Username:
+        input(type="username" name="username" id="username" required)
+      div
+        label(for="email") Email:
+        input(type="email" name="email" id="email" required)
+      div
+        label(for="password") Password:
+        input(type="password" name="password" id="password" required)
+      div
+        button(type="submit") Register 
+
+    br
+    a(href="/login") Login
+
+    script.
+      // Intercept form submission to store user info in localStorage
+      document.getElementById('registerForm').addEventListener('submit', function(event) {
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+
+        // Store basic user info in localStorage
+        localStorage.setItem('registeredUsername', username);
+        localStorage.setItem('registeredEmail', email);
+        localStorage.setItem('registeredDate', new Date().toLocaleString());
+        
+        // Allow form to submit as usual
+      });

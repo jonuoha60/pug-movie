@@ -1,0 +1,49 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/stylesheets/addmovie.css')
+    title Movies List
+  body
+    script.
+      const username = localStorage.getItem('registeredUsername');
+      const email = localStorage.getItem('registeredEmail');
+
+      if (!username || !email) {
+        window.location.href = '/login';
+      }
+
+    block content
+      h1 Movies List
+
+      p Welcome #{'${username}'}!
+
+      ul
+        each movie in movies
+          li
+            h2= movie.name
+            p Description: #{movie.description}
+            p Year: #{movie.year}
+            p Genres: #{movie.genres.join(', ')}
+            p Rating: #{movie.rating}
+            a(href=`/movies/edit?id=${movie._id}`) Edit
+
+            // Delete Form
+            form(action='/movies/delete' method='POST')
+              input(type='hidden' name='id' value=movie._id)
+              button(type='submit') Delete
+
+      a(href='/movies/add') Add New Movie
+
+      br
+      button(onclick='logout()') Logout
+
+    script.
+      // Display username in welcome message
+      document.querySelector('p').innerHTML = `Welcome ${username}!`;
+
+      // Logout function
+      function logout() {
+        localStorage.clear();
+        window.location.href = '/login';
+      }

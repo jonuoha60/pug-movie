@@ -1,0 +1,37 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/stylesheets/addmovie.css')
+    title Edit Movie
+  body
+    script.
+      const username = localStorage.getItem('registeredUsername');
+      const email = localStorage.getItem('registeredEmail');
+
+      if (!username || !email) {
+        window.location.href = '/login';
+      }
+    
+    h1 Edit Movie
+
+    form(action=`/movies/edit?id=${movie._id}` method="POST")
+      div
+        label(for="name") Movie Name:
+        input(type="text" name="name" id="name" required value=movie.name)
+      div
+        label(for="description") Description:
+        textarea(name="description" id="description" required)= movie.description
+      div
+        label(for="year") Year:
+        input(type="number" name="year" id="year" required value=movie.year)
+      div
+        label(for="genres") Genres (comma separated):
+        input(type="text" name="genres" id="genres" required value=movie.genres.join(','))
+      div
+        label(for="rating") Rating:
+        input(type="number" name="rating" id="rating" step="0.1" min="0" max="10" required value=movie.rating)
+      div
+        button(type="submit") Save
+
+    a(href="/movies") Back to Movie List

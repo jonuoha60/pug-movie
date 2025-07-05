@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/stylesheets/addmovie.css')
+
+    title Login
+  body
+    h1 Login
+
+    form(action="/login" method="POST")
+
+      div
+        label(for="email") Email:
+        input(type="email" name="email" id="email" required)
+      div
+        label(for="password") Password:
+        input(type="password" name="password" id="password" required)
+      div
+        button(type="submit") Login 
+
+    br
+    a(href="/register") Register
