@@ -5,18 +5,10 @@ html(lang='en')
     link(rel='stylesheet', href='/stylesheets/addmovie.css')
     title Movies List
   body
-    script.
-      const username = localStorage.getItem('registeredUsername');
-      const email = localStorage.getItem('registeredEmail');
-
-      if (!username || !email) {
-        window.location.href = '/login';
-      }
-
     block content
       h1 Movies List
 
-      p Welcome #{'${username}'}!
+      p Welcome #{user.username}!
 
       ul
         each movie in movies
@@ -36,14 +28,6 @@ html(lang='en')
       a(href='/movies/add') Add New Movie
 
       br
-      button(onclick='logout()') Logout
+      form(action='/logout' method='POST')
+        button(type='submit') Logout
 
-    script.
-      // Display username in welcome message
-      document.querySelector('p').innerHTML = `Welcome ${username}!`;
-
-      // Logout function
-      function logout() {
-        localStorage.clear();
-        window.location.href = '/login';
-      }

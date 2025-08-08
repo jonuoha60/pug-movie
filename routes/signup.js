@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', async (req, res) => {
-    const { username, email, password, userId } = req.body;
+    const { username, email, password } = req.body;
 
     try {
         // Check if user already exists by email
@@ -25,7 +25,6 @@ app.post('/', async (req, res) => {
 
         // Create new user
         const newUser = new User({
-            userId,
             username,
             email,
             password: passwordHash

@@ -6,13 +6,7 @@ html(lang='en')
 
     title Add New Movie
   body
-    script.
-      const username = localStorage.getItem('registeredUsername');
-      const email = localStorage.getItem('registeredEmail');
-
-      if (!username || !email) {
-        window.location.href = '/login';
-      }
+    
     h1 Add a New Movie
 
     form(action="/movies/add" method="POST")

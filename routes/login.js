@@ -5,7 +5,7 @@ const User = require("../models/user.js");
 const app = express.Router();
 
 app.get('/', (req, res) => {
-    res.render('login'); // Render the signup page
+    res.render('login'); // Render the login page
 });
 
 app.post('/', async (req, res) => {
@@ -22,6 +22,12 @@ app.post('/', async (req, res) => {
     if (!passwordMatch) {
       return res.status(404).send("Invalid email or password");
     }
+
+    req.session.user = {
+      id: user._id,
+      email: user.email,
+      username: user.username
+    };
 
     res.redirect('/movies');
 

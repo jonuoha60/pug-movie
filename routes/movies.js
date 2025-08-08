@@ -5,28 +5,44 @@ const app = express.Router();
 
 // List all movies
 app.get('/', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    
     try {
-        const movies = await Movie.find();
-        res.render('movies', { movies: movies || [] });
+        const user = req.session.user;
+        const movies = await Movie.find({ user: user.id }); // filter by logged-in user
+        
+        res.render('movies', { movies, user });
     } catch (err) {
-        res.status(404).send('Error fetching movies');
+        console.error(err);
+        res.status(500).send('Error fetching movies');
     }
 });
 
+
 // Render add movie form
 app.get('/add', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
     res.render('addMovie'); // Your addMovie.pug
 });
 
 // Handle adding new movie
 app.post('/add', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
     const { name, description, year, genres, rating } = req.body;
 
     const movie = new Movie({
         name,
+        user: req.session.user.id, // Store only the user's ID
         description,
         year,
-        genres: genres.split(',').map(g => g.trim()), // trim spaces
+        genres: genres.split(',').map(g => g.trim()),
         rating
     });
 
@@ -34,50 +50,72 @@ app.post('/add', async (req, res) => {
         await movie.save();
         res.redirect('/movies');
     } catch (err) {
-        res.status(404).send('Error adding movie');
+        console.error(err);
+        res.status(500).send('Error adding movie');
     }
 });
+
 
 // Render edit form with movie data pre-filled
+// GET /movies/edit?id=...
 app.get('/edit', async (req, res) => {
-    const { id } = req.query;
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
 
-    try {
-        const movie = await Movie.findById(id);
-        if (!movie) return res.status(404).send('Movie not found');
-        res.render('editMovie', { movie }); // Pass movie to template
-    } catch (err) {
-        res.status(404).send('Error fetching movie for edit');
-    }
+  const { id } = req.query;
+  if (!id) return res.status(400).send('Missing movie id');
+
+  try {
+    const user = req.session.user;
+    // Find movie that matches id AND belongs to logged-in user
+    const movie = await Movie.findOne({ _id: id, user: user.id });
+
+    if (!movie) return res.status(404).send('Movie not found or not authorized');
+
+    // Render edit page, pass movie and user
+    res.render('editMovie', { movie, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error fetching movie for edit');
+  }
 });
 
-// Handle editing movie
+// POST /movies/edit?id=...
 app.post('/edit', async (req, res) => {
-    const { id } = req.query;
-    const { name, description, year, genres, rating } = req.body;
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
 
-    try {
-        const movie = await Movie.findByIdAndUpdate(
-            id,
-            {
-                name,
-                description,
-                year,
-                genres: genres.split(',').map(g => g.trim()),
-                rating
-            },
-            { new: true }
-        );
+  const { id } = req.query;
+  if (!id) return res.status(400).send('Missing movie id');
 
-        if (!movie) {
-            return res.status(404).send('Movie not found');
-        }
+  const { name, description, year, genres, rating } = req.body;
 
-        res.redirect('/movies');
-    } catch (err) {
-        res.status(404).send('Error updating movie');
-    }
+  try {
+    const user = req.session.user;
+    // Only update if movie._id === id AND movie.user === current user id
+    const updated = await Movie.findOneAndUpdate(
+      { _id: id, user: user.id },
+      {
+        name,
+        description,
+        year,
+        genres: genres.split(',').map(g => g.trim()),
+        rating
+      },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).send('Movie not found or not authorized');
+
+    res.redirect('/movies');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating movie');
+  }
 });
+
 
 app.post('/delete', async (req, res) => {
     const { id } = req.body;

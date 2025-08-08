@@ -5,14 +5,23 @@ var cookieParser = require('cookie-parser');
 var lessMiddleware = require('less-middleware');
 var logger = require('morgan');
 var mongoose = require("mongoose")
-
+const session = require('express-session');
+const dotenv = require("dotenv")
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var moviesRouter = require('./routes/movies');
 var registerRouter = require('./routes/signup');
 var loginRouter = require('./routes/login');
+var loginOut = require('./routes/logout');
+dotenv.config()
 
 var app = express();
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
 
 
 
@@ -32,6 +41,7 @@ app.use('/users', usersRouter);
 app.use('/movies', moviesRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
+app.use('/logout', loginOut);
 
 mongoose.connect("mongodb://127.0.0.1:27017/peopledb", {
     useNewUrlParser: true,
